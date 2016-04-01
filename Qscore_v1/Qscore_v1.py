@@ -2,13 +2,11 @@
 # -*- coding: utf-8 -*-
 __author__ = 'BG'  
 
-import urllib  
-import urllib2  
-import cookielib  
+import urllib, urllib2  
+import cookielib
 import re
 
 class URP:
-	"""docstring for URP"""
 
 	def __init__(self,username,password):
 		self.usr = username
@@ -43,9 +41,7 @@ class URP:
 			print '-----------------------------------------------------------'
 			flag = True
 		return flag
-		
-		# text = response.read()  
-		
+			
 	def BXQ_score(self):
 	  	self.score_html = urllib2.urlopen('http://bksjw.chd.edu.cn/bxqcjcxAction.do').read()
 
@@ -59,23 +55,21 @@ class URP:
 	  	self.score_html = urllib2.urlopen('http://bksjw.chd.edu.cn/gradeLnAllAction.do?type=ln&oper=fainfo&fajhh=3792').read()
 	
 	def calc_gpa(self):
-
 		reg = re.compile(r'<tr class="odd".*?>.*?<td.*?</td>.*?<td.*?</td>.*?<td.*?</td>.*?<td.*?</td>.*?<td align="center">\s*(\S+)\s*</td>.*?<td.*?</td>.*?<td align="center">.*?<p align="center">(.*?)&nbsp.*?</P>.*?</td>.*?<td.*?</td>.*?</tr>.*?',re.S)
 		myItems = reg.findall(self.score_html)
-		# print len(myItems)
 
 		score = []
-		grades = []
+		credit = []
 		sum = 0.0
 		weight = 0.0
 
 		for item in myItems:
-			grades.append(item[0])
+			credit.append(item[0])
 			score.append(item[1])
 		
 		for i in range(len(score)):
 			try:
-				we = float(grades[i])
+				we = float(credit[i])
 				add = float(score[i])
 				sum += add*we
 				weight += we
@@ -137,19 +131,6 @@ def query_score():
 		urp.calc_gpa()
 	else:
 		return
-
-'''
-<tr class="odd" onMouseOut="this.className='even';" onMouseOver="this.className='evenfocus';">
-	<td align="center">             1107001S            </td>						课程号
-    <td align="center">            	 123            </td>							课序号 
-    <td align="center">           形势与政策            </td>						课程名
-    <td align="center">             &nbsp;            </td> 						英文课程名
-    <td align="center">             2            </td>                              学分
-    <td align="center">          公共基础必修            </td> 						课程属性 
-    <td align="center">   <p align="center">92.0&nbsp;</P>  </td>               	成绩
-    <td>            <p align="center">&nbsp;</P>            </td>				 	未通过原因
-</tr>
-'''
 
 if __name__ == '__main__':
 	query_score()
