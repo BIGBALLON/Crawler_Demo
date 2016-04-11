@@ -14,7 +14,7 @@ if not os.path.exists('./swf'):
 
 # 需要的正则表达式
 tmp_pat = re.compile(r'<ul class="tm_list">(.*?)</ul>',re.S)
-game_pat = re.compile( r'<li><a href="(/flash.*?)"><img alt=.*?src=".*?"><b>(.*?)</b></a><em><a href="/flash_fl/.*?">.*?</li>', re.S )
+game_pat = re.compile( r'<li><a href="(/flash.*?)"><img alt=.*?src=".*?"><b>(.*?)</b>.*?</li>', re.S )
 swf_pat = re.compile(r'_strGamePath="(.*?swf)"',re.S)
 
 game_html = requests.get(hw_url)
