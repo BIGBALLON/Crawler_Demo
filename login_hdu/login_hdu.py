@@ -31,7 +31,7 @@ content = urllib2.urlopen(req_host).read()
 # 账号密码换成你自己的
 postdata=urllib.urlencode({
 	'username':'China_Lee',
-	'userpass':'xxxxx',
+	'userpass':'XXXX',
 	'login':'Sign In'
 })
 
@@ -59,11 +59,15 @@ down_html = urllib2.urlopen(req_code).read()
 # 分析页面后得到正则表达式
 pattern = re.compile('<textarea id=usercode style="display:none;text-align:left;">(.+?)</textarea>',re.S)
 # 使用正则表达式匹配code
-down_code = pattern.findall(down_html)[0]
+down_code = pattern.search(down_html)
+if down_code == None:
+    print "error"
+
 # 使用unescape处理html中的转义字符
-code = html_parser.unescape(down_code)
-# 使用replace处理\r\n,windows下和linux下并不相同
-code = code.replace('\r\n','\n')
-# 将代码存储为test.cpp
-open('test.cpp',"w").write(code)
+else:
+    code = html_parser.unescape(down_code.group(1))
+    # 使用replace处理\r\n,windows下和linux下并不相同
+    code = code.replace('\r\n','\n')
+    # 将代码存储为test.cpp
+    open('test.cpp',"w").write(code)
 

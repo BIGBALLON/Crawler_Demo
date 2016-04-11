@@ -3,9 +3,6 @@ __author__ = 'BG'
 import urllib2
 import os
 import re
-import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
 
 class ZOLPIC:
 
@@ -33,8 +30,8 @@ class ZOLPIC:
 	# 通过正则表达式对图片地址进行匹配
 	# 创建文件并写入数据
 	def downloadPic(self,url,ml):
-		src_html = re.compile(r'<img src="(.*?)">').findall(url)[0]
-		pic_name = re.compile(r'http.*/(.*[jpg|png])').findall(src_html)[0]
+		src_html = re.search(r'<img src="(.*?)">',url).group(1)
+		pic_name = re.search(r'http.*/(.*[jpg|png])',src_html).group(1)
 		file_name = r'./PIC/'+ ml + r'/' + pic_name
 		if os.path.exists(file_name):							#已经抓取过
 			print '图片已经存在 %s' % pic_name
@@ -42,44 +39,39 @@ class ZOLPIC:
 		picsrc = urllib2.urlopen(src_html).read()
 		# print picsrc
 		print '正在下载图片 %s' % pic_name
-		open( file_name,"w").write(picsrc)
+		open( file_name,"wb").write(picsrc)
 
 	def startCrawler(self):
 		html = self.getHtml(self.cla_html)
 		while True:
-			reg = re.compile(r'<ul class="pic-list2  clearfix">.*</ins></li>		</ul>',re.DOTALL)
-			page = reg.findall(html)
-			#print page
-			regpic = re.compile(r'href="(/bizhi/.*?html)"',re.DOTALL)
-			pic = regpic.findall(page[0])
+			page = re.search(r'<ul class="pic-list2  clearfix">(.*)</ins></li>		</ul>',html,re.DOTALL).group(1)
+			pic = re.findall(r'href="(/bizhi/.*?html)"',page,re.DOTALL)
 			for p in pic:
 				cur_page = self.getHtml(self.base_html+p)
-				num = re.compile(r'picTotal 		: ([0-9]+)')
-				picTotal = int(num.findall(cur_page)[0])
-				ml_name = re.compile(r'nowGroupName 	: "(.*?)"').findall(cur_page)[0]
+				picTotal = int(re.search(r'picTotal 		: ([0-9]+)',cur_page).group(1))
+				ml_name = re.search(r'nowGroupName 	: "(.*?)"',cur_page).group(1)
 				print '\n\n当前组图名: %s , 共有 %d 张 '%(ml_name,picTotal)
 				print '-------------------------------------------'
 				if not os.path.exists(r'./PIC/'+str(ml_name)):
 					os.mkdir(r'./PIC/'+str(ml_name))
 				while picTotal > 0 :
-					ori_screen	=  re.compile(r'oriScreen.*: "(.*?)"').findall(cur_page)[0]
+					ori_screen	=  re.search(r'oriScreen.*: "(.*?)"',cur_page).group(1)
 					# print ori_screen
 					if  ori_screen:
-						full_pic = re.compile(r'href="(/showpic/%s.*?.html)' %ori_screen).findall(cur_page)[0]
+						full_pic = re.search(r'href="(/showpic/%s.*?.html)'%ori_screen,cur_page).group(1)
 						# print full_pic
 						next_page = cur_page
 						cur_page = self.getHtml(self.base_html+full_pic)
 						# print cur_page
 						self.downloadPic(cur_page,ml_name)
-						cur_page = self.base_html + re.compile(r'nextPic.*: "(/bizhi/.*?html)"').findall(next_page)[0]
+						cur_page = self.base_html + re.search(r'nextPic.*: "(/bizhi/.*?html)"',next_page).group(1)
 						cur_page = self.getHtml(cur_page)
 					picTotal = picTotal - 1
 					print '-------------------------------------------'
-			pat = re.compile(r'<a id="pageNext" href="(.*)" class="next".*?>')
-			nextPage = pat.findall(html)
-			html = self.getHtml(self.base_html + nextPage[0]) 
-			if not html:
-				return 
+			nextPage = re.search(r'<a id="pageNext" href="(.*)" class="next".*?>',html)
+			if nextPage == None:
+				return
+			html = self.getHtml(self.base_html + nextPage.group(1)) 
 
 if __name__ == '__main__':
 	spider = ZOLPIC()

@@ -62,6 +62,7 @@ if __name__ == '__main__':
 	status_url = status_url  + usr + '&status=5'
 	status_html = s.get(status_url,cookies=cookies).text
 	flag = True
+	print "Just go!"
 	while( flag ):
 		runid_list = runid_pat.findall(status_html)
 
@@ -69,21 +70,20 @@ if __name__ == '__main__':
 			code_url = codebase_url + id
 			down_html = s.get(code_url,cookies=cookies).text
 
-			down_code = code_pat.findall(down_html)[0]
-			language = lan_pat.findall(down_html)[0]
-			problemid = problem_pat.findall(down_html)[0]
+			down_code = code_pat.search(down_html).group(1)
+			language = lan_pat.search(down_html).group(1)
+			problemid = problem_pat.search(down_html).group(1)
 
 			suffix = lan_judge(language)
 			code = html_parser.unescape(down_code).encode('utf-8')
 			code = code.replace('\r\n','\n')
 			open( base_path + 'hdu' + problemid + '__' + id + suffix,"wb").write(code)
 		
-		nexturl = nextpage_pat.findall(status_html)
-		# print nexturl[0]
-		if nexturl == []:
+		nexturl = nextpage_pat.search(status_html)
+		if nexturl == None:
 			flag = False
 		else:
-			status_url = host_url + nexturl[0]
+			status_url = host_url + nexturl.group(1)
 			status_html = s.get(status_url,cookies=cookies).text
 	print "all of your ac codes were saved!"
 
