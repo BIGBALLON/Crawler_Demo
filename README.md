@@ -1,6 +1,6 @@
 # crawler_demo
 
-这仅仅是我的一个爬虫小练习：
+这仅仅是我的一些爬虫小练习：
 
 - 4399game是一个自动爬取4399小游戏的爬虫(当时写这个爬虫的目的纯粹是想弄点小游戏给表弟玩而已)
 - CFCrawler是一个抓取codeforces题目的爬虫，并且可以html2pdf.sh把html转化成pdf
